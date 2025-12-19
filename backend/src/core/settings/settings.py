@@ -28,7 +28,7 @@ N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     # 'rest_framework_simplejwt.token_blacklist',  # опционально
-
+    'rest_framework_api_key',
     # Project apps
     'apps.chat',
 ]

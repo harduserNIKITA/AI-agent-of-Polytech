@@ -2,6 +2,9 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import BasicAuthentication
+from rest_framework_api_key.permissions import HasAPIKey
 import threading
 
 from apps.chat.models import Chat, Message
@@ -73,6 +76,8 @@ class ChatViewSet(viewsets.ModelViewSet):
 
 
 class N8nCallbackView(APIView):
+    authentication_classes = []
+    permission_classes = []
     def post(self, request):
         chat_id = request.data.get('chat_id')
         response_text = request.data.get('response')
