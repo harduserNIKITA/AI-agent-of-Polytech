@@ -185,7 +185,15 @@
 > npm run dev
 
 ## Демонстрация работы веб-приложения
+> Вход
+<img width="1280" height="607" alt="image" src="https://github.com/user-attachments/assets/f8b15c60-fbc7-457d-bbfd-b63cd8709be7" />
+
+> Регистрация
+<img width="1280" height="604" alt="image" src="https://github.com/user-attachments/assets/fe546127-fd55-40db-868c-38d6da6b3ac1" />
+
+
 > Главное меню
+
 <img width="1280" height="607" alt="image" src="https://github.com/user-attachments/assets/b070e06e-b1e2-469d-ab3b-e58a43d71017" />
 
 > Создание нового чата
