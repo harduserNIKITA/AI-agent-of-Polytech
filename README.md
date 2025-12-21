@@ -178,5 +178,21 @@
 
 > npm run dev
 
+## Демонстрация работы веб-приложения
+> Главное меню
+<img width="1280" height="607" alt="image" src="https://github.com/user-attachments/assets/b070e06e-b1e2-469d-ab3b-e58a43d71017" />
+> Создание нового чата
+<img width="1280" height="609" alt="image" src="https://github.com/user-attachments/assets/018bd5fe-6f0d-4d8a-b1ab-650f74e37b30" />
+> Новый чат создан
+<img width="1280" height="608" alt="image" src="https://github.com/user-attachments/assets/7b837688-897e-4bae-82c8-13ec77eabca8" />
+> Демонстрация работы
+<img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/7d77d5c3-6d90-4b2a-8418-74fcbb8f622e" />
 
+<img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/8669c1d0-06a3-40f2-98e0-b2859877dc3b" />
+
+<img width="1280" height="606" alt="image" src="https://github.com/user-attachments/assets/79602ac4-27af-4f01-8866-ece3a52984d2" />
+
+<img width="1280" height="604" alt="image" src="https://github.com/user-attachments/assets/fea72aca-e3d8-4984-91a1-9718a8f51d22" />
+
+<img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/3bbc22cd-9842-46a3-afec-777e96f6e7d1" />
 
