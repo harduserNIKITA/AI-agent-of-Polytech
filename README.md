@@ -181,11 +181,17 @@
 ## Демонстрация работы веб-приложения
 > Главное меню
 <img width="1280" height="607" alt="image" src="https://github.com/user-attachments/assets/b070e06e-b1e2-469d-ab3b-e58a43d71017" />
+
 > Создание нового чата
+
 <img width="1280" height="609" alt="image" src="https://github.com/user-attachments/assets/018bd5fe-6f0d-4d8a-b1ab-650f74e37b30" />
+
 > Новый чат создан
+
 <img width="1280" height="608" alt="image" src="https://github.com/user-attachments/assets/7b837688-897e-4bae-82c8-13ec77eabca8" />
+
 > Демонстрация работы
+
 <img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/7d77d5c3-6d90-4b2a-8418-74fcbb8f622e" />
 
 <img width="1280" height="605" alt="image" src="https://github.com/user-attachments/assets/8669c1d0-06a3-40f2-98e0-b2859877dc3b" />
