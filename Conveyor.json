@@ -1,0 +1,233 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "Ты ассистент-помощник студента вопрос касаемо университета СПБПУ. На каждый вопрос обращайся в векторную базу данных, если ответ не найден - напиши об этом. Если используешь перенос строки, вместо \"\\n\" пиши \"\\\\n\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        -48
+      ],
+      "id": "11042986-de7e-4587-84cd-43dded1f3617",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        176
+      ],
+      "id": "ec00d78a-6f02-48b2-b6bb-ca7c540606c9",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qgMQPVaIsLJCNGK6",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "82608666-017b-4b45-b354-b3513f6d2f9b",
+              "name": "text",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -48
+      ],
+      "id": "e3288b16-b611-4842-a757-72c05030c244",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "knoledge_base",
+        "toolDescription": "test",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "politex",
+          "mode": "list",
+          "cachedResultName": "politex"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        176
+      ],
+      "id": "7a67164a-c4d4-437f-ba7f-35c2035d9ead",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "sWcrYYBJzX9IjBmg",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        384
+      ],
+      "id": "d21ef05c-6845-4bc1-874a-d37dacaba9c8",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "qgMQPVaIsLJCNGK6",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "471f447e-f324-4016-8acd-f0610908ec07",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        176,
+        -48
+      ],
+      "id": "9478b360-8957-4078-8ad0-e4f6fb39d687",
+      "name": "Webhook",
+      "webhookId": "471f447e-f324-4016-8acd-f0610908ec07"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://2.59.40.85:8000/api/v1/n8n/callback/",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": \"{{ $('Webhook').item.json.body.chat_id }}\",\n  \"response\": \"{{ $json.output.replace(/(?:\\r\\n|\\r|\\n)/g, '\\\\n') }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -48
+      ],
+      "id": "4aa2e763-cdd9-4293-82a4-82f42e6f3087",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "7132fa27-5554-416e-8d00-ea481c76ff0d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "afac0dbe271de6d3ae3fdd24e363544ff7ebdac585269504bf02d460ae32f8e2"
+  },
+  "id": "NhOh5n1ErJSScG2u",
+  "tags": []
+}

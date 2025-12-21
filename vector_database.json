@@ -1,0 +1,307 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "politex",
+          "mode": "list",
+          "cachedResultName": "politex"
+        },
+        "options": {}
+      },
+      "id": "1b9d717e-179f-4e6b-8738-6d812fdc4580",
+      "name": "Qdrant Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        800,
+        -256
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "sWcrYYBJzX9IjBmg",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "56ce17d1-76f3-46ac-b94f-8b55a5edc934",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        784,
+        -48
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "openAiApi": {
+          "id": "qgMQPVaIsLJCNGK6",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "539e8ee6-58a4-4112-bbc2-ec28d8933f8d",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        960,
+        -48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 300,
+        "chunkOverlap": 30
+      },
+      "id": "0913f5c2-8bb9-4f99-b21f-647b4dc60948",
+      "name": "Token Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "position": [
+        912,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -256
+      ],
+      "id": "4ecab827-926d-45b6-b0f0-3b8a969eb470",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "protocol": "sftp",
+        "path": "/opt/n8n/.n8n_data/data/merge_from_ofoct.txt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.ftp",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -240
+      ],
+      "id": "342e1caf-8b6b-4610-a7f7-c6e11c325aa3",
+      "name": "FTP",
+      "credentials": {
+        "sftp": {
+          "id": "iVY7UC1zCiA9uPay",
+          "name": "FTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Получаем текст из входного JSON (поле data)\nconst inputData = $input.all()[0].json;\nconst text = inputData.data;\n\nif (!text || typeof text !== 'string') {\n  throw new Error('Текст не найден в поле \"data\" или не является строкой');\n}\n\n// --- Разбиваем текст на чанки, сохраняя целостность слов и предложений ---\nfunction splitTextIntoChunks(text, targetChunkSize = 500) {\n  const chunks = [];\n  let currentChunk = \"\";\n  let lastSentenceEnd = 0;\n\n  // Ищем границы предложений (точки, восклицательные/вопросительные знаки)\n  const sentenceRegex = /[.!?]\\s+/g;\n  let match;\n  \n  while ((match = sentenceRegex.exec(text)) !== null) {\n    const sentenceEnd = match.index + match[0].length;\n    const sentence = text.slice(lastSentenceEnd, sentenceEnd).trim();\n    \n    if (currentChunk.length + sentence.length > targetChunkSize) {\n      if (currentChunk.trim()) chunks.push(currentChunk.trim());\n      currentChunk = sentence + \" \";\n    } else {\n      currentChunk += sentence + \" \";\n    }\n    \n    lastSentenceEnd = sentenceEnd;\n  }\n\n  // Добавляем остаток текста (если не закончился на точку)\n  const remainingText = text.slice(lastSentenceEnd).trim();\n  if (remainingText) {\n    if (currentChunk.length + remainingText.length > targetChunkSize) {\n      if (currentChunk.trim()) chunks.push(currentChunk.trim());\n      currentChunk = remainingText;\n    } else {\n      currentChunk += remainingText;\n    }\n  }\n\n  if (currentChunk.trim()) chunks.push(currentChunk.trim());\n  return chunks;\n}\n\n// Разбиваем текст\nconst chunks = splitTextIntoChunks(text, 10000);\n\n// Формируем выход для n8n\nreturn chunks.map((chunk, index) => ({\n  json: {\n    chunkId: index + 1,\n    text: chunk,\n    charCount: chunk.length,\n    endsWithSentence: /[.!?]$/.test(chunk) // Проверяем, заканчивается ли на предложение\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        512
+      ],
+      "id": "a1fdc005-b9f7-4e4b-a8f0-8800b78b8a1f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        592,
+        464
+      ],
+      "id": "0cee14fe-891f-43b3-9a13-59a7fec956ed",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1104,
+        496
+      ],
+      "id": "3d1b3383-b280-43cb-9af9-f54b11de063f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        688
+      ],
+      "id": "523351f6-7f89-4c1f-a2fe-f2ab456dc0d7"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1456,
+        192
+      ],
+      "id": "bd9598b2-2595-4f9d-b094-3be3bf18a615",
+      "name": "Convert to File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "FTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FTP": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e873873b-94a5-4413-aa3c-6a5f0f94aceb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "afac0dbe271de6d3ae3fdd24e363544ff7ebdac585269504bf02d460ae32f8e2"
+  },
+  "id": "wbFCqLuwTS0AQkyV",
+  "tags": []
+}
